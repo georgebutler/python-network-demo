@@ -1,35 +1,19 @@
 import socket
+import pickle
 import threading
 
-server = None
-HOST_ADDR = "0.0.0.0"
-HOST_PORT = 8080
-clients = []
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(("127.0.0.1", 32007))
+server.listen()
 
 
-def start_server():
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    server.bind((HOST_ADDR, HOST_PORT))
-    server.listen(5)
-    threading._start_new_thread(accept_clients, (server, " "))
+def threaded_client(connection, address):
+    print("New Client Connected: ", address)
+    connection.send("Hello from server!".encode())
 
 
-def accept_clients(the_server):
-    while True:
-        client, addr = the_server.accept()
-        clients.append(client)
+while True:
+    conn, addr = server.accept()
 
-        threading._start_new_thread(display_client_info, (client, addr))
-
-
-def display_client_info(client, addr):
-    print("Client: %s, Address: %s", client, addr)
-
-
-def main():
-    start_server()
-
-
-if __name__ == "__main__":
-    main()
+    thread = threading.Thread(target=threaded_client, args=(conn, addr))
+    thread.start()
