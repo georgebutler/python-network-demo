@@ -9,4 +9,4 @@
 
 ## Important Notes
 
-This networking demo is purely for educational purposes. There have been no security features implemented, so do not use it for production applications.
+This networking demo is purely for educational purposes. There have been no security features implemented, so do not use it production.

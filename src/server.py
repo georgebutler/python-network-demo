@@ -94,10 +94,36 @@ def create_room(name):
 @app.route('/join/<name>', methods=['POST'])
 def join_room(name):
     data = request.json
-    return make_response(jsonify(data), 200)
+
+    if name in rooms.keys():
+        if "name" in data.keys():
+            if data["name"] in users.keys():
+                if len(users[data["name"]]["current_room"]) <= 0:
+                    users[data["name"]]["current_room"] = name
+                    return make_response(jsonify(data), 200)
+                else:
+                    return make_response(jsonify({
+                        "success": False,
+                        "error": "You must leave your current room before joining another."
+                    }), 400)
+            else:
+                return make_response(jsonify({
+                    "success": False,
+                    "error": "User name not found in 'users'"
+                }), 400)
+        else:
+            return make_response(jsonify({
+                "success": False,
+                "error": "Must include 'name' as JSON data."
+            }), 400)
+    else:
+        return make_response(jsonify({
+            "success": False,
+            "error": "Room not found in 'rooms'"
+        }), 400)
 
 
-@app.route('/leave/<name>', methods=['POST'])
+@ app.route('/leave/<name>', methods=['POST'])
 def leave_room(name):
     print("Leaving room named: " + name)
     return make_response(jsonify({}), 200)
