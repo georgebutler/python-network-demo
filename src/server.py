@@ -30,7 +30,7 @@ def get_users():
 
 @app.route('/users/<name>', methods=['POST'])
 def create_user(name):
-    if (len(name) >= 3 and len(name) <= 16):
+    if len(name) >= 3 and len(name) <= 16:
         if name in users.keys():
             return make_response(jsonify({
                 "success": False,
@@ -65,16 +65,19 @@ def get_rooms():
 # Create a room with a given name
 @app.route('/rooms/<name>', methods=['POST'])
 def create_room(name):
-    if (len(name) >= 3 and len(name) <= 16):
+    if len(name) >= 3 and len(name) <= 16:
         if name in rooms.keys():
             return make_response(jsonify({
                 "success": False,
                 "error": "Room name is taken."
             }), 200)
         else:
+            # Moves: 0 = empty space, 1 = first player, 2 = second player
+
             rooms[name] = {
                 "name": name,
-                "users": {}
+                "users": {},
+                "moves": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             }
 
             return make_response(jsonify({
@@ -96,11 +99,15 @@ def join_room(name):
     data = request.json
 
     if name in rooms.keys():
-        if "name" in data.keys():
+        if len(rooms[name]["users"]) <= 1:
+            print(data.keys())
             if data["name"] in users.keys():
                 if len(users[data["name"]]["current_room"]) <= 0:
+                    index = len(rooms[name]["users"])
+
+                    rooms[name]["users"][index] = data["name"]
                     users[data["name"]]["current_room"] = name
-                    return make_response(jsonify(data), 200)
+                    return make_response(jsonify(rooms[name]), 200)
                 else:
                     return make_response(jsonify({
                         "success": False,
@@ -122,8 +129,31 @@ def join_room(name):
             "error": "Room not found in 'rooms'"
         }), 400)
 
+# Moves
 
-@ app.route('/leave/<name>', methods=['POST'])
-def leave_room(name):
-    print("Leaving room named: " + name)
-    return make_response(jsonify({}), 200)
+
+@app.route('/act/<name>', methods=['POST'])
+def act_room(name):
+    data = request.json
+
+    if name in rooms.keys():
+        if "name" in data.keys():
+            if data["name"] in users.keys():
+                if len(users[data["name"]]["current_room"]) > 0:
+                    users[data["name"]]["current_room"] = name
+                    return make_response(jsonify(data), 200)
+            else:
+                return make_response(jsonify({
+                    "success": False,
+                    "error": "User name not found in 'users'"
+                }), 400)
+        else:
+            return make_response(jsonify({
+                "success": False,
+                "error": "Must include 'name' as JSON data."
+            }), 400)
+    else:
+        return make_response(jsonify({
+            "success": False,
+            "error": "Room not found in 'rooms'"
+        }), 400)
