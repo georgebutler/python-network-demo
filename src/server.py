@@ -100,23 +100,28 @@ def join_room(name):
 
     if name in rooms.keys():
         if len(rooms[name]["users"]) <= 1:
-            print(data.keys())
-            if data["name"] in users.keys():
-                if len(users[data["name"]]["current_room"]) <= 0:
-                    index = len(rooms[name]["users"])
+            if "name" in data.keys():
+                if data["name"] in users.keys():
+                    if len(users[data["name"]]["current_room"]) <= 0:
+                        index = len(rooms[name]["users"])
 
-                    rooms[name]["users"][index] = data["name"]
-                    users[data["name"]]["current_room"] = name
-                    return make_response(jsonify(rooms[name]), 200)
+                        rooms[name]["users"][index] = data["name"]
+                        users[data["name"]]["current_room"] = name
+                        return make_response(jsonify(rooms[name]), 200)
+                    else:
+                        return make_response(jsonify({
+                            "success": False,
+                            "error": "You must leave your current room before joining another."
+                        }), 400)
                 else:
                     return make_response(jsonify({
                         "success": False,
-                        "error": "You must leave your current room before joining another."
+                        "error": "User name not found in 'users'"
                     }), 400)
             else:
                 return make_response(jsonify({
                     "success": False,
-                    "error": "User name not found in 'users'"
+                    "error": "Must include 'name' as JSON data."
                 }), 400)
         else:
             return make_response(jsonify({
