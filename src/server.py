@@ -126,7 +126,7 @@ def join_room(name):
         else:
             return make_response(jsonify({
                 "success": False,
-                "error": "Must include 'name' as JSON data."
+                "error": "Room is full."
             }), 400)
     else:
         return make_response(jsonify({
