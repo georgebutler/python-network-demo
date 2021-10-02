@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, make_response
 
-app = Flask(__name__)
+application = Flask(__name__)
 
 rooms = {}
 users = {}
@@ -8,7 +8,7 @@ users = {}
 # Index
 
 
-@app.route('/')
+@application.route('/')
 def index():
     return make_response(jsonify({
         "success": True
@@ -21,14 +21,14 @@ def index():
 # List all the users
 
 
-@app.route('/users', methods=['GET'])
+@application.route('/users', methods=['GET'])
 def get_users():
     return make_response(jsonify(users), 200)
 
 # Create a user with a given name
 
 
-@app.route('/users/<name>', methods=['POST'])
+@application.route('/users/<name>', methods=['POST'])
 def create_user(name):
     if len(name) >= 3 and len(name) <= 16:
         if name in users.keys():
@@ -57,13 +57,13 @@ def create_user(name):
 
 
 # List all the rooms
-@app.route('/rooms', methods=['GET'])
+@application.route('/rooms', methods=['GET'])
 def get_rooms():
     return make_response(jsonify(rooms), 200)
 
 
 # Create a room with a given name
-@app.route('/rooms/<name>', methods=['POST'])
+@application.route('/rooms/<name>', methods=['POST'])
 def create_room(name):
     if len(name) >= 3 and len(name) <= 16:
         if name in rooms.keys():
@@ -94,7 +94,7 @@ def create_room(name):
 # Joining
 
 
-@app.route('/join/<name>', methods=['POST'])
+@application.route('/join/<name>', methods=['POST'])
 def join_room(name):
     data = request.json
 
@@ -137,7 +137,7 @@ def join_room(name):
 # Moves
 
 
-@app.route('/act/<name>', methods=['POST'])
+@application.route('/act/<name>', methods=['POST'])
 def act_room(name):
     data = request.json
 
