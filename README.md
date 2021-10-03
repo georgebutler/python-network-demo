@@ -3,7 +3,7 @@
 
 ## Server
 
-* export FLASK_APP=src/server.py
+* export FLASK_APP=src/application.py
 * export FLASK_ENV=development
 * python -m flask run
 

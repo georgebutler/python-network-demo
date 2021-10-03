@@ -72,12 +72,14 @@ def create_room(name):
                 "error": "Room name is taken."
             }), 200)
         else:
-            # Moves: 0 = empty space, 1 = first player, 2 = second player
+            # Moves: 0 = Empty space, 1 = first player, 2 = second player
+            # Turn: 0 = Game Over, 1 = first player, 2 = second player
 
             rooms[name] = {
                 "name": name,
                 "users": {},
-                "moves": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                "moves": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                "turn": 1
             }
 
             return make_response(jsonify({
@@ -137,20 +139,59 @@ def join_room(name):
 # Moves
 
 
-@application.route('/act/<name>', methods=['POST'])
-def act_room(name):
+@application.route('/act/<room>', methods=['POST'])
+def act_room(room):
     data = request.json
 
-    if name in rooms.keys():
+    if room in rooms.keys():
         if "name" in data.keys():
-            if data["name"] in users.keys():
-                if len(users[data["name"]]["current_room"]) > 0:
-                    users[data["name"]]["current_room"] = name
-                    return make_response(jsonify(data), 200)
+            if "position" in data.keys():
+                if data["name"] in users.keys():
+                    userRoom = users[data["name"]]["current_room"]
+
+                    if room == userRoom:
+                        key = -1
+
+                        for k, v in rooms[room]["users"].items():
+                            if v == data["name"]:
+                                key = k
+
+                        if rooms[room]["turn"] == key + 1:
+                            position = int(data["position"])
+                            symbol = key + 1
+
+                            if rooms[room]["moves"][position] == 0:
+                                rooms[room]["moves"][position] = symbol
+                                rooms[room]["turn"] = 1 if rooms[room]["turn"] != 1 else 2
+
+                                # TODO: Check win condition and set turn to 0.
+                                # TODO: Don't let them make a turn if room doesn't have two players.
+
+                                return make_response(jsonify(rooms[room]), 200)
+                            else:
+                                return make_response(jsonify({
+                                    "success": False,
+                                    "error": "The position index: " + str(position) + " is taken."
+                                }), 400)
+                        else:
+                            return make_response(jsonify({
+                                "success": False,
+                                "error": "Not your turn."
+                            }), 400)
+                    else:
+                        return make_response(jsonify({
+                            "success": False,
+                            "error": "User not allowed to move in that room."
+                        }), 400)
+                else:
+                    return make_response(jsonify({
+                        "success": False,
+                        "error": "User name not found in 'users'"
+                    }), 400)
             else:
                 return make_response(jsonify({
                     "success": False,
-                    "error": "User name not found in 'users'"
+                    "error": "Must include 'position' as JSON data."
                 }), 400)
         else:
             return make_response(jsonify({
