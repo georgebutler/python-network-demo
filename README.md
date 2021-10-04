@@ -3,6 +3,8 @@
 
 ## Server
 
+### Locally
+
 * export FLASK_APP=src/application.py
 * export FLASK_ENV=development
 * python -m flask run

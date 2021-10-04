@@ -164,6 +164,27 @@ def act_room(room):
                                 rooms[room]["moves"][position] = symbol
                                 rooms[room]["turn"] = 1 if rooms[room]["turn"] != 1 else 2
 
+                                # Check win condition
+
+                                # Across the top
+                                if rooms[room]["moves"][0] == rooms[room]["moves"][1] == rooms[room]["moves"][2] != 0:
+                                    rooms[room]["turn"] = 0
+                                    print("WINNER: " +
+                                          str(rooms[room]["turn"]) + "!!!!!!!")
+                                    return make_response(jsonify(rooms[room]), 200)
+                                # Across the middle
+                                elif rooms[room]["moves"][3] == rooms[room]["moves"][4] == rooms[room]["moves"][5] != 0:
+                                    rooms[room]["turn"] = 0
+                                    print("WINNER: " +
+                                          str(rooms[room]["turn"]) + "!!!!!!!")
+                                    return make_response(jsonify(rooms[room]), 200)
+                                # Across the bottom
+                                elif rooms[room]["moves"][6] == rooms[room]["moves"][7] == rooms[room]["moves"][8] != 0:
+                                    rooms[room]["turn"] = 0
+                                    print("WINNER: " +
+                                          str(rooms[room]["turn"]) + "!!!!!!!")
+                                    return make_response(jsonify(rooms[room]), 200)
+
                                 # TODO: Check win condition and set turn to 0.
                                 # TODO: Don't let them make a turn if room doesn't have two players.
 
