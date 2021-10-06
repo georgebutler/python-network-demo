@@ -35,7 +35,7 @@ def create_user(name):
             return make_response(jsonify({
                 "success": False,
                 "error": "User name is taken."
-            }), 200)
+            }), 400)
         else:
             users[name] = {
                 "name": name,
@@ -70,7 +70,7 @@ def create_room(name):
             return make_response(jsonify({
                 "success": False,
                 "error": "Room name is taken."
-            }), 200)
+            }), 400)
         else:
             # Moves: 0 = Empty space, 1 = first player, 2 = second player
             # Turn: 0 = Game Over, 1 = first player, 2 = second player
@@ -79,7 +79,8 @@ def create_room(name):
                 "name": name,
                 "users": {},
                 "moves": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                "turn": 1
+                "turn": 1,
+                "winner": 0
             }
 
             return make_response(jsonify({
@@ -109,7 +110,10 @@ def join_room(name):
 
                         rooms[name]["users"][index] = data["name"]
                         users[data["name"]]["current_room"] = name
-                        return make_response(jsonify(rooms[name]), 200)
+                        return make_response(jsonify({
+                            "success": True,
+                            "room": rooms[name]
+                        }), 200)
                     else:
                         return make_response(jsonify({
                             "success": False,
@@ -156,6 +160,13 @@ def act_room(room):
                             if v == data["name"]:
                                 key = k
 
+                        if rooms[room]["winner"] > 0 or rooms[room]["turn"] == 0:
+                            return make_response(jsonify({
+                                "success": False,
+                                "error": "The game is complete.",
+                                "room": rooms[room]
+                            }), 400)
+
                         if rooms[room]["turn"] == key + 1:
                             position = int(data["position"])
                             symbol = key + 1
@@ -169,26 +180,23 @@ def act_room(room):
                                 # Across the top
                                 if rooms[room]["moves"][0] == rooms[room]["moves"][1] == rooms[room]["moves"][2] != 0:
                                     rooms[room]["turn"] = 0
-                                    print("WINNER: " +
-                                          str(rooms[room]["turn"]) + "!!!!!!!")
-                                    return make_response(jsonify(rooms[room]), 200)
+                                    print("Won:" + str(rooms[room]["turn"]))
                                 # Across the middle
                                 elif rooms[room]["moves"][3] == rooms[room]["moves"][4] == rooms[room]["moves"][5] != 0:
                                     rooms[room]["turn"] = 0
-                                    print("WINNER: " +
-                                          str(rooms[room]["turn"]) + "!!!!!!!")
-                                    return make_response(jsonify(rooms[room]), 200)
+                                    print("Won:" + str(rooms[room]["turn"]))
                                 # Across the bottom
                                 elif rooms[room]["moves"][6] == rooms[room]["moves"][7] == rooms[room]["moves"][8] != 0:
                                     rooms[room]["turn"] = 0
-                                    print("WINNER: " +
-                                          str(rooms[room]["turn"]) + "!!!!!!!")
-                                    return make_response(jsonify(rooms[room]), 200)
+                                    print("Won:" + str(rooms[room]["turn"]))
 
                                 # TODO: Check win condition and set turn to 0.
                                 # TODO: Don't let them make a turn if room doesn't have two players.
 
-                                return make_response(jsonify(rooms[room]), 200)
+                                return make_response(jsonify({
+                                    "success": True,
+                                    "room": rooms[room]
+                                }), 200)
                             else:
                                 return make_response(jsonify({
                                     "success": False,
