@@ -160,6 +160,15 @@ def act_room(room):
                             if v == data["name"]:
                                 key = k
 
+                        # Requires both players
+                        if len(rooms[room]["users"]) < 2:
+                            return make_response(jsonify({
+                                "success": False,
+                                "error": "Not enough players.",
+                                "room": rooms[room]
+                            }), 400)
+
+                        # If winner already determined
                         if rooms[room]["winner"] > 0 or rooms[room]["turn"] == 0:
                             return make_response(jsonify({
                                 "success": False,
@@ -167,6 +176,7 @@ def act_room(room):
                                 "room": rooms[room]
                             }), 400)
 
+                        # Check if it's your turn
                         if rooms[room]["turn"] == key + 1:
                             position = int(data["position"])
                             symbol = key + 1
