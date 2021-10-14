@@ -62,6 +62,26 @@ def get_rooms():
     return make_response(jsonify(rooms), 200)
 
 
+# Get the status of the user's room
+@application.route('/rooms/status', methods=['GET'])
+def get_rooms():
+    data = request.json
+
+    if "name" in data.keys():
+        if data["name"] in users.keys():
+            return make_response(jsonify(rooms[users[data["name"]]["current_room"]]), 200)
+        else:
+            return make_response(jsonify({
+                "success": False,
+                "error": "User name not found in 'users'"
+            }), 400)
+    else:
+        return make_response(jsonify({
+            "success": False,
+            "error": "Must include 'name' as JSON data."
+        }), 400)
+
+
 # Create a room with a given name
 @application.route('/rooms/<name>', methods=['POST'])
 def create_room(name):
@@ -190,17 +210,49 @@ def act_room(room):
                                 # Across the top
                                 if rooms[room]["moves"][0] == rooms[room]["moves"][1] == rooms[room]["moves"][2] != 0:
                                     rooms[room]["turn"] = 0
+                                    rooms[room]["winner"] = rooms[room]["turn"]
                                     print("Won:" + str(rooms[room]["turn"]))
                                 # Across the middle
                                 elif rooms[room]["moves"][3] == rooms[room]["moves"][4] == rooms[room]["moves"][5] != 0:
                                     rooms[room]["turn"] = 0
+                                    rooms[room]["winner"] = rooms[room]["turn"]
                                     print("Won:" + str(rooms[room]["turn"]))
                                 # Across the bottom
                                 elif rooms[room]["moves"][6] == rooms[room]["moves"][7] == rooms[room]["moves"][8] != 0:
                                     rooms[room]["turn"] = 0
+                                    rooms[room]["winner"] = rooms[room]["turn"]
+                                    print("Won:" + str(rooms[room]["turn"]))
+                                # Vertical left
+                                elif rooms[room]["moves"][0] == rooms[room]["moves"][3] == rooms[room]["moves"][6] != 0:
+                                    rooms[room]["turn"] = 0
+                                    rooms[room]["winner"] = rooms[room]["turn"]
+                                    print("Won:" + str(rooms[room]["turn"]))
+                                # Vertical center
+                                elif rooms[room]["moves"][1] == rooms[room]["moves"][4] == rooms[room]["moves"][7] != 0:
+                                    rooms[room]["turn"] = 0
+                                    rooms[room]["winner"] = rooms[room]["turn"]
+                                    print("Won:" + str(rooms[room]["turn"]))
+                                # Vertical right
+                                elif rooms[room]["moves"][2] == rooms[room]["moves"][5] == rooms[room]["moves"][8] != 0:
+                                    rooms[room]["turn"] = 0
+                                    rooms[room]["winner"] = rooms[room]["turn"]
+                                    print("Won:" + str(rooms[room]["turn"]))
+                                # Vertical right
+                                elif rooms[room]["moves"][2] == rooms[room]["moves"][5] == rooms[room]["moves"][8] != 0:
+                                    rooms[room]["turn"] = 0
+                                    rooms[room]["winner"] = rooms[room]["turn"]
+                                    print("Won:" + str(rooms[room]["turn"]))
+                                # Diagonal right
+                                elif rooms[room]["moves"][0] == rooms[room]["moves"][4] == rooms[room]["moves"][8] != 0:
+                                    rooms[room]["turn"] = 0
+                                    rooms[room]["winner"] = rooms[room]["turn"]
+                                    print("Won:" + str(rooms[room]["turn"]))
+                                # Diagonal left
+                                elif rooms[room]["moves"][2] == rooms[room]["moves"][4] == rooms[room]["moves"][6] != 0:
+                                    rooms[room]["turn"] = 0
+                                    rooms[room]["winner"] = rooms[room]["turn"]
                                     print("Won:" + str(rooms[room]["turn"]))
 
-                                # TODO: Check win condition and set turn to 0.
                                 # TODO: Don't let them make a turn if room doesn't have two players.
 
                                 return make_response(jsonify({
